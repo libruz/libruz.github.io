@@ -99,15 +99,31 @@
             padding: 40px;
         }
         
-        .login-tabs {
+        .login-type {
             display: flex;
             background: var(--input-bg);
             border-radius: 12px;
             padding: 4px;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
+            position: relative;
         }
         
-        .tab-btn {
+        .type-indicator {
+            position: absolute;
+            height: calc(100% - 8px);
+            width: calc(50% - 4px);
+            background: white;
+            border-radius: 8px;
+            box-shadow: var(--shadow-sm);
+            transition: transform 0.3s ease;
+            top: 4px;
+        }
+        
+        .type-indicator.admin {
+            transform: translateX(calc(100% + 4px));
+        }
+        
+        .type-btn {
             flex: 1;
             padding: 12px;
             border: none;
@@ -118,20 +134,33 @@
             cursor: pointer;
             border-radius: 8px;
             transition: all 0.3s;
+            position: relative;
+            z-index: 1;
         }
         
-        .tab-btn.active {
-            background: white;
+        .type-btn.active {
             color: var(--primary-color);
-            box-shadow: var(--shadow-sm);
         }
         
-        .tab-content {
+        .admin-notice {
+            background: #fef3c7;
+            border: 1px solid #fde68a;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            font-size: 14px;
             display: none;
         }
         
-        .tab-content.active {
+        .admin-notice.show {
             display: block;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .admin-notice strong {
+            color: #92400e;
+            display: block;
+            margin-bottom: 5px;
         }
         
         .form-group {
@@ -203,12 +232,12 @@
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s;
             margin-top: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 10px;
+            transition: all 0.3s;
         }
         
         .btn-login:hover {
@@ -224,90 +253,6 @@
             opacity: 0.6;
             cursor: not-allowed;
             transform: none !important;
-        }
-        
-        .divider {
-            display: flex;
-            align-items: center;
-            margin: 25px 0;
-            color: var(--secondary-color);
-        }
-        
-        .divider::before,
-        .divider::after {
-            content: '';
-            flex: 1;
-            height: 1px;
-            background: var(--border-color);
-        }
-        
-        .divider span {
-            padding: 0 15px;
-            font-size: 14px;
-        }
-        
-        .role-buttons {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-        
-        .role-btn {
-            padding: 12px;
-            border: 2px solid var(--border-color);
-            background: var(--input-bg);
-            border-radius: 10px;
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 8px;
-            color: var(--text-color);
-        }
-        
-        .role-btn:hover {
-            border-color: var(--primary-color);
-            background: white;
-        }
-        
-        .role-btn.active {
-            border-color: var(--primary-color);
-            background: white;
-            color: var(--primary-color);
-        }
-        
-        .role-btn i {
-            font-size: 20px;
-        }
-        
-        .alert {
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            display: none;
-            animation: slideIn 0.3s ease-out;
-        }
-        
-        .alert.error {
-            background: #fef2f2;
-            border: 1px solid #fee2e2;
-            color: var(--danger-color);
-        }
-        
-        .alert.success {
-            background: #ecfdf5;
-            border: 1px solid #d1fae5;
-            color: var(--success-color);
-        }
-        
-        .alert.info {
-            background: #eff6ff;
-            border: 1px solid #dbeafe;
-            color: var(--primary-color);
         }
         
         .remember-forgot {
@@ -379,23 +324,88 @@
             animation: spin 1s linear infinite;
         }
         
-        .admin-note {
-            background: #fef3c7;
-            border: 1px solid #fde68a;
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 20px;
-            font-size: 14px;
+        .role-selection {
+            margin-bottom: 25px;
         }
         
-        .admin-note strong {
-            color: #92400e;
-            display: block;
-            margin-bottom: 5px;
+        .role-label {
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 10px;
+            color: var(--text-color);
+        }
+        
+        .role-buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+        }
+        
+        .role-btn {
+            padding: 12px 8px;
+            border: 2px solid var(--border-color);
+            background: var(--input-bg);
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            color: var(--text-color);
+        }
+        
+        .role-btn:hover {
+            border-color: var(--primary-color);
+            background: white;
+        }
+        
+        .role-btn.active {
+            border-color: var(--primary-color);
+            background: white;
+            color: var(--primary-color);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .role-btn i {
+            font-size: 18px;
+        }
+        
+        .alert {
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: none;
+            animation: fadeIn 0.3s ease-out;
+        }
+        
+        .alert.error {
+            background: #fef2f2;
+            border: 1px solid #fee2e2;
+            color: var(--danger-color);
+        }
+        
+        .alert.success {
+            background: #ecfdf5;
+            border: 1px solid #d1fae5;
+            color: var(--success-color);
+        }
+        
+        .alert.info {
+            background: #eff6ff;
+            border: 1px solid #dbeafe;
+            color: var(--primary-color);
         }
         
         @keyframes spin {
             to { transform: rotate(360deg); }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
         
         @keyframes slideIn {
@@ -430,13 +440,29 @@
             }
             
             .role-buttons {
-                grid-template-columns: 1fr;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+            
+            .role-btn {
+                padding: 12px;
+                font-size: 14px;
             }
             
             .remember-forgot {
                 flex-direction: column;
                 align-items: flex-start;
                 gap: 15px;
+            }
+            
+            .login-type {
+                margin-bottom: 20px;
+            }
+        }
+        
+        @media (max-width: 360px) {
+            .role-buttons {
+                grid-template-columns: 1fr;
             }
         }
     </style>
@@ -461,131 +487,92 @@
                 <div class="alert" id="errorAlert"></div>
                 <div class="alert" id="successAlert"></div>
                 
-                <!-- Tabs for login type -->
-                <div class="login-tabs">
-                    <button class="tab-btn active" data-tab="standard">Standardowe logowanie</button>
-                    <button class="tab-btn" data-tab="admin">Logowanie admina</button>
+                <!-- Login type switcher -->
+                <div class="login-type">
+                    <div class="type-indicator" id="typeIndicator"></div>
+                    <button type="button" class="type-btn active" id="btnStandard">
+                        Użytkownicy systemu
+                    </button>
+                    <button type="button" class="type-btn" id="btnAdmin">
+                        Administrator systemu
+                    </button>
                 </div>
                 
-                <!-- Standard Login Tab -->
-                <div id="standard-tab" class="tab-content active">
-                    <div class="admin-note">
-                        <strong>Dla administratorów:</strong>
-                        Jeżeli jesteś administratorem systemu, przełącz się na zakładkę "Logowanie admina"
-                    </div>
-                    
+                <!-- Admin notice -->
+                <div class="admin-notice" id="adminNotice">
+                    <strong>Logowanie administratora systemu</strong>
+                    <p>Jeżeli nie jesteś administratorem systemu, wybierz opcję "Użytkownicy systemu"</p>
+                </div>
+                
+                <!-- User type selection (only for standard users) -->
+                <div class="role-selection" id="roleSelection">
+                    <div class="role-label">Wybierz typ konta:</div>
                     <div class="role-buttons">
-                        <button class="role-btn" data-role="director">
+                        <button type="button" class="role-btn active" data-role="director">
                             <i class="fas fa-user-tie"></i>
-                            Dyrektor
+                            <span>Dyrektor</span>
                         </button>
-                        <button class="role-btn" data-role="teacher">
+                        <button type="button" class="role-btn" data-role="teacher">
                             <i class="fas fa-chalkboard-teacher"></i>
-                            Nauczyciel
+                            <span>Nauczyciel</span>
                         </button>
-                        <button class="role-btn" data-role="student">
+                        <button type="button" class="role-btn" data-role="student">
                             <i class="fas fa-user-graduate"></i>
-                            Uczeń
+                            <span>Uczeń</span>
                         </button>
-                        <button class="role-btn" data-role="parent">
+                        <button type="button" class="role-btn" data-role="parent">
                             <i class="fas fa-users"></i>
-                            Rodzic
+                            <span>Rodzic</span>
                         </button>
                     </div>
-                    
-                    <form id="standardLoginForm">
-                        <div class="form-group">
-                            <label for="standardLogin">Login</label>
-                            <div class="input-with-icon">
-                                <i class="fas fa-user"></i>
-                                <input 
-                                    type="text" 
-                                    id="standardLogin" 
-                                    class="form-control" 
-                                    placeholder="Wpisz swój login" 
-                                    required
-                                >
-                            </div>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="standardPassword">Hasło</label>
-                            <div class="input-with-icon">
-                                <i class="fas fa-lock"></i>
-                                <input 
-                                    type="password" 
-                                    id="standardPassword" 
-                                    class="form-control" 
-                                    placeholder="Wpisz swoje hasło" 
-                                    required
-                                >
-                                <button type="button" class="password-toggle" id="toggleStandardPassword">
-                                    <i class="fas fa-eye"></i>
-                                </button>
-                            </div>
-                        </div>
-                        
-                        <div class="remember-forgot">
-                            <div class="checkbox-group">
-                                <input type="checkbox" id="rememberMe">
-                                <label for="rememberMe">Zapamiętaj mnie</label>
-                            </div>
-                            <a href="#" class="forgot-password">Nie pamiętasz hasła?</a>
-                        </div>
-                        
-                        <button type="submit" class="btn-login" id="standardLoginBtn">
-                            <span>Zaloguj się</span>
-                            <div class="loading-spinner" id="standardSpinner"></div>
-                        </button>
-                    </form>
                 </div>
                 
-                <!-- Admin Login Tab -->
-                <div id="admin-tab" class="tab-content">
-                    <div class="admin-note">
-                        <strong>Uwaga:</strong>
-                        Logowanie administratora systemu Libruz
+                <!-- Login form -->
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label for="loginInput" id="loginLabel">Login</label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-user" id="loginIcon"></i>
+                            <input 
+                                type="text" 
+                                id="loginInput" 
+                                class="form-control" 
+                                placeholder="Wpisz swój login" 
+                                required
+                            >
+                        </div>
                     </div>
                     
-                    <form id="adminLoginForm">
-                        <div class="form-group">
-                            <label for="adminLogin">Login administratora</label>
-                            <div class="input-with-icon">
-                                <i class="fas fa-user-shield"></i>
-                                <input 
-                                    type="text" 
-                                    id="adminLogin" 
-                                    class="form-control" 
-                                    value="admin"
-                                    readonly
-                                    style="background-color: #f8f9fa;"
-                                >
-                            </div>
+                    <div class="form-group">
+                        <label for="passwordInput">Hasło</label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-lock"></i>
+                            <input 
+                                type="password" 
+                                id="passwordInput" 
+                                class="form-control" 
+                                placeholder="Wpisz swoje hasło" 
+                                required
+                            >
+                            <button type="button" class="password-toggle" id="togglePassword">
+                                <i class="fas fa-eye"></i>
+                            </button>
                         </div>
-                        
-                        <div class="form-group">
-                            <label for="adminPassword">Hasło administratora</label>
-                            <div class="input-with-icon">
-                                <i class="fas fa-key"></i>
-                                <input 
-                                    type="password" 
-                                    id="adminPassword" 
-                                    class="form-control" 
-                                    placeholder="Wpisz hasło administratora" 
-                                    required
-                                >
-                                <button type="button" class="password-toggle" id="toggleAdminPassword">
-                                    <i class="fas fa-eye"></i>
-                                </button>
-                            </div>
+                    </div>
+                    
+                    <div class="remember-forgot">
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="rememberMe">
+                            <label for="rememberMe">Zapamiętaj mnie</label>
                         </div>
-                        
-                        <button type="submit" class="btn-login" id="adminLoginBtn">
-                            <span>Zaloguj jako administrator</span>
-                            <div class="loading-spinner" id="adminSpinner"></div>
-                        </button>
-                    </form>
-                </div>
+                        <a href="#" class="forgot-password" onclick="showForgotPassword()">Nie pamiętasz hasła?</a>
+                    </div>
+                    
+                    <button type="submit" class="btn-login" id="loginBtn">
+                        <span id="loginBtnText">Zaloguj się</span>
+                        <div class="loading-spinner" id="loginSpinner"></div>
+                    </button>
+                </form>
                 
                 <div class="login-footer">
                     <p>System Libruz v1.0.0 © 2024</p>
@@ -595,11 +582,51 @@
         </div>
     </div>
 
+    <!-- Simple forgot password modal -->
+    <div id="forgotPasswordModal" style="
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.5);
+        z-index: 1000;
+        align-items: center;
+        justify-content: center;
+    ">
+        <div style="
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        ">
+            <h3 style="margin-bottom: 15px; color: var(--primary-color);">Resetowanie hasła</h3>
+            <p style="margin-bottom: 20px; color: var(--text-color);">
+                Skontaktuj się z administratorem systemu lub dyrektorem swojej szkoły w celu resetu hasła.
+            </p>
+            <div style="text-align: right;">
+                <button onclick="hideForgotPassword()" style="
+                    padding: 10px 20px;
+                    background: var(--primary-color);
+                    color: white;
+                    border: none;
+                    border-radius: 8px;
+                    cursor: pointer;
+                ">
+                    Zamknij
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <script>
-        // Supabase Configuration
-        const SUPABASE_URL = 'https://your-project.supabase.co'; // ZMIEŃ NA SWÓJ URL
-        const SUPABASE_ANON_KEY = 'your-anon-key'; // ZMIEŃ NA SWÓJ KLUCZ
+        // Supabase Configuration - ZMIEŃ TE WARTOŚCI NA SWOJE
+        const SUPABASE_URL = 'https://your-project.supabase.co';
+        const SUPABASE_ANON_KEY = 'your-anon-key';
         
         // Initialize Supabase
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
@@ -619,12 +646,25 @@
         // DOM Elements
         const errorAlert = document.getElementById('errorAlert');
         const successAlert = document.getElementById('successAlert');
-        const tabButtons = document.querySelectorAll('.tab-btn');
+        const typeIndicator = document.getElementById('typeIndicator');
+        const btnStandard = document.getElementById('btnStandard');
+        const btnAdmin = document.getElementById('btnAdmin');
+        const adminNotice = document.getElementById('adminNotice');
+        const roleSelection = document.getElementById('roleSelection');
         const roleButtons = document.querySelectorAll('.role-btn');
-        const standardLoginForm = document.getElementById('standardLoginForm');
-        const adminLoginForm = document.getElementById('adminLoginForm');
+        const loginForm = document.getElementById('loginForm');
+        const loginLabel = document.getElementById('loginLabel');
+        const loginIcon = document.getElementById('loginIcon');
+        const loginInput = document.getElementById('loginInput');
+        const passwordInput = document.getElementById('passwordInput');
+        const togglePasswordBtn = document.getElementById('togglePassword');
+        const loginBtn = document.getElementById('loginBtn');
+        const loginBtnText = document.getElementById('loginBtnText');
+        const loginSpinner = document.getElementById('loginSpinner');
+        const forgotPasswordModal = document.getElementById('forgotPasswordModal');
         
         // Current state
+        let isAdminMode = false;
         let currentRole = 'director';
         
         // Initialize the page
@@ -632,145 +672,41 @@
             // Check if user is already logged in
             checkExistingSession();
             
-            // Set up tab switching
-            tabButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    const tabId = this.getAttribute('data-tab');
-                    switchTab(tabId);
-                });
+            // Set up login type switching
+            btnStandard.addEventListener('click', function() {
+                setLoginType(false);
+            });
+            
+            btnAdmin.addEventListener('click', function() {
+                setLoginType(true);
             });
             
             // Set up role selection
             roleButtons.forEach(button => {
                 button.addEventListener('click', function() {
-                    const role = this.getAttribute('data-role');
-                    selectRole(role);
+                    selectRole(this.getAttribute('data-role'));
                 });
             });
             
-            // Set up password toggles
-            document.getElementById('toggleStandardPassword').addEventListener('click', function() {
-                togglePasswordVisibility('standardPassword', this);
+            // Set up password toggle
+            togglePasswordBtn.addEventListener('click', function() {
+                togglePasswordVisibility();
             });
             
-            document.getElementById('toggleAdminPassword').addEventListener('click', function() {
-                togglePasswordVisibility('adminPassword', this);
-            });
-            
-            // Handle standard login form submission
-            standardLoginForm.addEventListener('submit', async function(e) {
+            // Handle login form submission
+            loginForm.addEventListener('submit', async function(e) {
                 e.preventDefault();
-                await handleStandardLogin();
-            });
-            
-            // Handle admin login form submission
-            adminLoginForm.addEventListener('submit', async function(e) {
-                e.preventDefault();
-                await handleAdminLogin();
+                await handleLogin();
             });
             
             // Auto-select first role
             selectRole('director');
+            
+            // Add demo data info
+            console.log('Dane logowania testowe:');
+            console.log('- Admin: login: "admin", hasło: "Grahamka321@##"');
+            console.log('- Przykładowy użytkownik: login: "test", hasło: "Test123!"');
         });
-        
-        // Switch between tabs
-        function switchTab(tabId) {
-            // Update tab buttons
-            tabButtons.forEach(button => {
-                button.classList.remove('active');
-                if (button.getAttribute('data-tab') === tabId) {
-                    button.classList.add('active');
-                }
-            });
-            
-            // Update tab content
-            document.querySelectorAll('.tab-content').forEach(content => {
-                content.classList.remove('active');
-            });
-            
-            document.getElementById(`${tabId}-tab`).classList.add('active');
-        }
-        
-        // Select role for standard login
-        function selectRole(role) {
-            roleButtons.forEach(button => {
-                button.classList.remove('active');
-                if (button.getAttribute('data-role') === role) {
-                    button.classList.add('active');
-                }
-            });
-            
-            currentRole = role;
-            
-            // Update placeholder text based on role
-            const loginInput = document.getElementById('standardLogin');
-            switch(role) {
-                case 'director':
-                    loginInput.placeholder = 'Wpisz login dyrektora';
-                    break;
-                case 'teacher':
-                    loginInput.placeholder = 'Wpisz login nauczyciela';
-                    break;
-                case 'student':
-                    loginInput.placeholder = 'Wpisz login ucznia';
-                    break;
-                case 'parent':
-                    loginInput.placeholder = 'Wpisz login rodzica';
-                    break;
-            }
-        }
-        
-        // Toggle password visibility
-        function togglePasswordVisibility(inputId, button) {
-            const input = document.getElementById(inputId);
-            const icon = button.querySelector('i');
-            
-            if (input.type === 'password') {
-                input.type = 'text';
-                icon.classList.remove('fa-eye');
-                icon.classList.add('fa-eye-slash');
-            } else {
-                input.type = 'password';
-                icon.classList.remove('fa-eye-slash');
-                icon.classList.add('fa-eye');
-            }
-        }
-        
-        // Show alert message
-        function showAlert(type, message) {
-            // Hide all alerts first
-            errorAlert.style.display = 'none';
-            successAlert.style.display = 'none';
-            
-            const alert = type === 'error' ? errorAlert : successAlert;
-            alert.className = `alert ${type}`;
-            alert.innerHTML = `
-                <i class="fas fa-${type === 'error' ? 'exclamation-circle' : 'check-circle'}"></i>
-                <span>${message}</span>
-            `;
-            alert.style.display = 'block';
-            
-            // Auto-hide after 5 seconds
-            setTimeout(() => {
-                alert.style.display = 'none';
-            }, 5000);
-        }
-        
-        // Show loading state
-        function setLoading(buttonId, isLoading) {
-            const button = document.getElementById(buttonId);
-            const spinner = button.querySelector('.loading-spinner');
-            
-            if (isLoading) {
-                button.disabled = true;
-                spinner.style.display = 'block';
-                button.querySelector('span').style.opacity = '0.5';
-            } else {
-                button.disabled = false;
-                spinner.style.display = 'none';
-                button.querySelector('span').style.opacity = '1';
-            }
-        }
         
         // Check existing session
         async function checkExistingSession() {
@@ -797,157 +733,275 @@
             }
         }
         
-        // Handle standard login (non-admin users)
-        async function handleStandardLogin() {
-            const login = document.getElementById('standardLogin').value.trim();
-            const password = document.getElementById('standardPassword').value;
+        // Set login type (admin or standard)
+        function setLoginType(adminMode) {
+            isAdminMode = adminMode;
+            
+            // Update buttons
+            btnStandard.classList.toggle('active', !adminMode);
+            btnAdmin.classList.toggle('active', adminMode);
+            
+            // Move indicator
+            typeIndicator.classList.toggle('admin', adminMode);
+            
+            // Show/hide admin notice
+            adminNotice.classList.toggle('show', adminMode);
+            
+            // Show/hide role selection
+            roleSelection.style.display = adminMode ? 'none' : 'block';
+            
+            // Update form labels and placeholders
+            if (adminMode) {
+                loginLabel.textContent = 'Login administratora';
+                loginInput.placeholder = 'Wpisz login administratora';
+                loginIcon.className = 'fas fa-user-shield';
+                loginInput.value = ADMIN_CREDENTIALS.login;
+                loginInput.readOnly = true;
+                loginInput.style.backgroundColor = '#f8f9fa';
+                loginBtnText.textContent = 'Zaloguj jako administrator';
+            } else {
+                loginLabel.textContent = 'Login';
+                loginInput.placeholder = 'Wpisz swój login';
+                loginIcon.className = 'fas fa-user';
+                loginInput.value = '';
+                loginInput.readOnly = false;
+                loginInput.style.backgroundColor = '';
+                loginBtnText.textContent = 'Zaloguj się';
+                updateLoginPlaceholder();
+            }
+            
+            // Focus on password field for admin
+            if (adminMode) {
+                setTimeout(() => {
+                    passwordInput.focus();
+                }, 100);
+            } else {
+                loginInput.focus();
+            }
+        }
+        
+        // Select role for standard users
+        function selectRole(role) {
+            roleButtons.forEach(button => {
+                button.classList.toggle('active', button.getAttribute('data-role') === role);
+            });
+            
+            currentRole = role;
+            updateLoginPlaceholder();
+        }
+        
+        // Update login placeholder based on selected role
+        function updateLoginPlaceholder() {
+            if (isAdminMode) return;
+            
+            switch(currentRole) {
+                case 'director':
+                    loginInput.placeholder = 'Wpisz login dyrektora (np. kowalskiD)';
+                    break;
+                case 'teacher':
+                    loginInput.placeholder = 'Wpisz login nauczyciela (np. nowakN)';
+                    break;
+                case 'student':
+                    loginInput.placeholder = 'Wpisz login ucznia (np. wisniewskiU)';
+                    break;
+                case 'parent':
+                    loginInput.placeholder = 'Wpisz login rodzica';
+                    break;
+            }
+        }
+        
+        // Toggle password visibility
+        function togglePasswordVisibility() {
+            const icon = togglePasswordBtn.querySelector('i');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+        
+        // Show alert message
+        function showAlert(type, message) {
+            // Hide all alerts first
+            errorAlert.style.display = 'none';
+            successAlert.style.display = 'none';
+            
+            const alert = type === 'error' ? errorAlert : successAlert;
+            alert.className = `alert ${type}`;
+            alert.innerHTML = `
+                <i class="fas fa-${type === 'error' ? 'exclamation-circle' : 'check-circle'}"></i>
+                <span>${message}</span>
+            `;
+            alert.style.display = 'block';
+            
+            // Auto-hide after 5 seconds
+            setTimeout(() => {
+                alert.style.display = 'none';
+            }, 5000);
+        }
+        
+        // Show loading state
+        function setLoading(isLoading) {
+            if (isLoading) {
+                loginBtn.disabled = true;
+                loginSpinner.style.display = 'block';
+                loginBtnText.style.opacity = '0.5';
+            } else {
+                loginBtn.disabled = false;
+                loginSpinner.style.display = 'none';
+                loginBtnText.style.opacity = '1';
+            }
+        }
+        
+        // Handle login
+        async function handleLogin() {
+            const login = loginInput.value.trim();
+            const password = passwordInput.value;
             const rememberMe = document.getElementById('rememberMe').checked;
             
             // Basic validation
             if (!login || !password) {
                 showAlert('error', 'Proszę wypełnić wszystkie pola');
-                standardLoginForm.classList.add('shake');
-                setTimeout(() => standardLoginForm.classList.remove('shake'), 500);
+                loginForm.classList.add('shake');
+                setTimeout(() => loginForm.classList.remove('shake'), 500);
                 return;
             }
             
-            setLoading('standardLoginBtn', true);
+            setLoading(true);
             
             try {
-                // 1. Find user profile by login
-                const { data: profile, error: profileError } = await supabase
-                    .from('user_profiles')
-                    .select('*')
-                    .eq('login', login)
-                    .eq('deleted_at', null)
-                    .single();
-                
-                if (profileError || !profile) {
-                    throw new Error('Nieprawidłowy login lub hasło');
+                if (isAdminMode) {
+                    // ADMIN LOGIN
+                    if (login === ADMIN_CREDENTIALS.login && password === ADMIN_CREDENTIALS.password) {
+                        // Successful admin login
+                        const adminUser = {
+                            id: 'admin',
+                            email: 'admin@libruz.pl',
+                            role: 'admin',
+                            login: 'admin',
+                            first_name: 'Administrator',
+                            last_name: 'Systemu',
+                            is_admin: true
+                        };
+                        
+                        // Store admin session
+                        localStorage.setItem('libruz_admin', JSON.stringify(adminUser));
+                        
+                        // Show success message
+                        showAlert('success', 'Logowanie administratora pomyślne! Przekierowywanie...');
+                        
+                        // Redirect to admin panel
+                        setTimeout(() => {
+                            window.location.href = '../admin/index.html';
+                        }, 1000);
+                    } else {
+                        throw new Error('Nieprawidłowe dane logowania administratora');
+                    }
+                } else {
+                    // STANDARD USER LOGIN
+                    await handleStandardUserLogin(login, password, rememberMe);
                 }
-                
-                // Check if account is locked
-                if (profile.is_locked) {
-                    throw new Error('Konto jest zablokowane. Skontaktuj się z administratorem.');
-                }
-                
-                // Check if password needs to be changed
-                if (profile.must_change_password) {
-                    // Store user ID for password change page
-                    localStorage.setItem('temp_user_id', profile.id);
-                    window.location.href = 'change-password.html';
-                    return;
-                }
-                
-                // 2. Attempt to sign in with Supabase Auth
-                const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
-                    email: profile.email,
-                    password: password
-                });
-                
-                if (authError) {
-                    // Increment failed login attempts
-                    await incrementFailedAttempts(profile.id);
-                    throw authError;
-                }
-                
-                // 3. Reset failed login attempts on successful login
-                await resetFailedAttempts(profile.id);
-                
-                // 4. Update last login timestamp
-                await updateLastLogin(profile.id);
-                
-                // 5. Store user session data
-                const userSession = {
-                    id: authData.user.id,
-                    email: authData.user.email,
-                    role: profile.role,
-                    school_id: profile.school_id,
-                    profile_id: profile.id,
-                    first_name: profile.first_name,
-                    last_name: profile.last_name,
-                    login: profile.login
-                };
-                
-                localStorage.setItem('libruz_user', JSON.stringify(userSession));
-                
-                // 6. Remember me option
-                if (rememberMe) {
-                    localStorage.setItem('libruz_remember', 'true');
-                }
-                
-                // 7. Show success message and redirect
-                showAlert('success', 'Logowanie pomyślne! Przekierowywanie...');
-                setTimeout(() => {
-                    redirectBasedOnRole(profile.role);
-                }, 1000);
-                
             } catch (error) {
                 console.error('Login error:', error);
-                
-                let errorMessage = 'Błąd logowania';
-                
-                if (error.message.includes('Invalid login credentials')) {
-                    errorMessage = 'Nieprawidłowy login lub hasło';
-                } else if (error.message.includes('Email not confirmed')) {
-                    errorMessage = 'Email nie został potwierdzony';
-                } else if (error.message.includes('Too many requests')) {
-                    errorMessage = 'Zbyt wiele prób logowania. Spróbuj później.';
-                } else {
-                    errorMessage = error.message || 'Wystąpił nieoczekiwany błąd';
-                }
-                
-                showAlert('error', errorMessage);
-                setLoading('standardLoginBtn', false);
+                handleLoginError(error);
+            } finally {
+                setLoading(false);
             }
         }
         
-        // Handle admin login
-        async function handleAdminLogin() {
-            const login = document.getElementById('adminLogin').value;
-            const password = document.getElementById('adminPassword').value;
+        // Handle standard user login
+        async function handleStandardUserLogin(login, password, rememberMe) {
+            // 1. Find user profile by login
+            const { data: profile, error: profileError } = await supabase
+                .from('user_profiles')
+                .select('*')
+                .eq('login', login)
+                .eq('deleted_at', null)
+                .single();
             
-            // Validation
-            if (!login || !password) {
-                showAlert('error', 'Proszę wypełnić wszystkie pola');
-                adminLoginForm.classList.add('shake');
-                setTimeout(() => adminLoginForm.classList.remove('shake'), 500);
+            if (profileError || !profile) {
+                throw new Error('Nieprawidłowy login lub hasło');
+            }
+            
+            // Check if account is locked
+            if (profile.is_locked) {
+                throw new Error('Konto jest zablokowane. Skontaktuj się z administratorem.');
+            }
+            
+            // Check if password needs to be changed
+            if (profile.must_change_password || profile.is_temp_password) {
+                // Store user ID for password change page
+                localStorage.setItem('temp_user_id', profile.id);
+                window.location.href = 'change-password.html';
                 return;
             }
             
-            setLoading('adminLoginBtn', true);
+            // 2. Attempt to sign in with Supabase Auth
+            const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+                email: profile.email,
+                password: password
+            });
             
-            // Simulate API call delay
-            setTimeout(async () => {
-                if (login === ADMIN_CREDENTIALS.login && password === ADMIN_CREDENTIALS.password) {
-                    // Successful admin login
-                    const adminUser = {
-                        id: 'admin',
-                        email: 'admin@libruz.pl',
-                        role: 'admin',
-                        login: 'admin',
-                        first_name: 'Administrator',
-                        last_name: 'Systemu',
-                        is_admin: true
-                    };
-                    
-                    // Store admin session
-                    localStorage.setItem('libruz_admin', JSON.stringify(adminUser));
-                    
-                    // Show success message
-                    showAlert('success', 'Logowanie administratora pomyślne! Przekierowywanie...');
-                    
-                    // Redirect to admin panel
-                    setTimeout(() => {
-                        window.location.href = '../admin/index.html';
-                    }, 1000);
-                    
-                } else {
-                    // Failed login
-                    showAlert('error', 'Nieprawidłowe dane logowania administratora');
-                    setLoading('adminLoginBtn', false);
-                }
-            }, 800); // Simulate network delay
+            if (authError) {
+                // Increment failed login attempts
+                await incrementFailedAttempts(profile.id);
+                throw authError;
+            }
+            
+            // 3. Reset failed login attempts on successful login
+            await resetFailedAttempts(profile.id);
+            
+            // 4. Update last login timestamp
+            await updateLastLogin(profile.id);
+            
+            // 5. Store user session data
+            const userSession = {
+                id: authData.user.id,
+                email: authData.user.email,
+                role: profile.role,
+                school_id: profile.school_id,
+                profile_id: profile.id,
+                first_name: profile.first_name,
+                last_name: profile.last_name,
+                login: profile.login
+            };
+            
+            localStorage.setItem('libruz_user', JSON.stringify(userSession));
+            
+            // 6. Remember me option
+            if (rememberMe) {
+                localStorage.setItem('libruz_remember', 'true');
+            }
+            
+            // 7. Show success message and redirect
+            showAlert('success', 'Logowanie pomyślne! Przekierowywanie...');
+            setTimeout(() => {
+                redirectBasedOnRole(profile.role);
+            }, 1000);
+        }
+        
+        // Handle login errors
+        function handleLoginError(error) {
+            let errorMessage = 'Błąd logowania';
+            
+            if (error.message.includes('Invalid login credentials')) {
+                errorMessage = 'Nieprawidłowy login lub hasło';
+            } else if (error.message.includes('Email not confirmed')) {
+                errorMessage = 'Email nie został potwierdzony';
+            } else if (error.message.includes('Too many requests')) {
+                errorMessage = 'Zbyt wiele prób logowania. Spróbuj później.';
+            } else if (error.message.includes('User not found')) {
+                errorMessage = 'Użytkownik nie istnieje w systemie';
+            } else {
+                errorMessage = error.message || 'Wystąpił nieoczekiwany błąd';
+            }
+            
+            showAlert('error', errorMessage);
         }
         
         // Increment failed login attempts
@@ -1006,6 +1060,9 @@
         // Redirect based on user role
         function redirectBasedOnRole(role) {
             switch(role) {
+                case 'admin':
+                    window.location.href = '../admin/index.html';
+                    break;
                 case 'director':
                     window.location.href = '../director/index.html';
                     break;
@@ -1020,21 +1077,40 @@
                     break;
                 default:
                     showAlert('error', 'Nieznana rola użytkownika');
-                    setLoading('standardLoginBtn', false);
             }
         }
         
-        // Add some demo accounts for testing (remove in production)
-        function setupDemoAccounts() {
-            // This is just for demonstration
-            console.log('Demo accounts available for testing:');
-            console.log('- Dyrektor: login: "kowalskiD", password: "Test123!"');
-            console.log('- Nauczyciel: login: "nowakN", password: "Test123!"');
-            console.log('- Uczeń: login: "wisniewskiU", password: "Test123!"');
+        // Show forgot password modal
+        function showForgotPassword() {
+            forgotPasswordModal.style.display = 'flex';
         }
         
-        // Call demo setup on page load
-        setupDemoAccounts();
+        // Hide forgot password modal
+        function hideForgotPassword() {
+            forgotPasswordModal.style.display = 'none';
+        }
+        
+        // Close modal when clicking outside
+        forgotPasswordModal.addEventListener('click', function(e) {
+            if (e.target === this) {
+                hideForgotPassword();
+            }
+        });
+        
+        // Add some demo accounts info for testing
+        console.log('Przykładowe loginy do testowania:');
+        console.log('1. Admin - login: admin, hasło: Grahamka321@##');
+        console.log('2. Dyrektor - login: kowalskiD, hasło: Dyrektor123!');
+        console.log('3. Nauczyciel - login: nowakN, hasło: Nauczyciel123!');
+        console.log('4. Uczeń - login: wisniewskiU, hasło: Uczen123!');
+        console.log('5. Rodzic - login: kowalskiR, hasło: Rodzic123!');
+        
+        // Pre-fill for testing (remove in production)
+        if (window.location.href.includes('localhost')) {
+            console.log('Tryb testowy - pre-filling form for testing');
+            loginInput.value = 'admin';
+            passwordInput.value = 'Grahamka321@##';
+        }
     </script>
 </body>
 </html>
