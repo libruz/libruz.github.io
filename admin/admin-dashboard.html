@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Libruz - Panel Administratora</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary-color: #64748b;
+            --sidebar-bg: #1e293b;
+            --sidebar-text: #94a3b8;
+            --sidebar-active: #3b82f6;
+            --background-color: #f1f5f9;
+            --card-bg: #ffffff;
+            --text-color: #334155;
+            --border-color: #e2e8f0;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* --- SIDEBAR --- */
+        .sidebar {
+            width: 260px;
+            background-color: var(--sidebar-bg);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+            transition: all 0.3s ease;
+            z-index: 100;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .sidebar-header i {
+            font-size: 24px;
+            color: var(--sidebar-active);
+        }
+
+        .sidebar-header h2 {
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .sidebar-menu {
+            padding: 20px 0;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .menu-category {
+            font-size: 12px;
+            text-transform: uppercase;
+            color: var(--sidebar-text);
+            padding: 10px 25px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 25px;
+            color: var(--sidebar-text);
+            text-decoration: none;
+            transition: all 0.2s;
+            cursor: pointer;
+            border-left: 3px solid transparent;
+        }
+
+        .menu-item:hover, .menu-item.active {
+            background: rgba(255,255,255,0.05);
+            color: white;
+        }
+
+        .menu-item.active {
+            border-left-color: var(--sidebar-active);
+            background: linear-gradient(90deg, rgba(59,130,246,0.1) 0%, transparent 100%);
+        }
+
+        .menu-item i {
+            width: 25px;
+            margin-right: 10px;
+        }
+
+        .sidebar-footer {
+            padding: 20px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .user-mini-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            background: var(--primary-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+        }
+
+        .user-info h4 {
+            font-size: 14px;
+            color: white;
+        }
+
+        .user-info p {
+            font-size: 12px;
+            color: var(--sidebar-text);
+        }
+
+        /* --- MAIN CONTENT --- */
+        .main-content {
+            flex: 1;
+            margin-left: 260px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        .top-header {
+            background: var(--card-bg);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 90;
+        }
+
+        .header-search {
+            position: relative;
+            width: 300px;
+        }
+
+        .header-search input {
+            width: 100%;
+            padding: 10px 15px 10px 40px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background: var(--background-color);
+            color: var(--text-color);
+        }
+
+        .header-search i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--secondary-color);
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .btn-icon {
+            background: none;
+            border: none;
+            color: var(--secondary-color);
+            font-size: 18px;
+            cursor: pointer;
+            position: relative;
+            padding: 8px;
+            border-radius: 50%;
+            transition: background 0.2s;
+        }
+
+        .btn-icon:hover {
+            background: var(--background-color);
+            color: var(--primary-color);
+        }
+
+        .badge {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            width: 8px;
+            height: 8px;
+            background: var(--danger);
+            border-radius: 50%;
+        }
+
+        .btn-logout {
+            padding: 8px 16px;
+            background-color: #fee2e2;
+            color: var(--danger);
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-logout:hover {
+            background-color: #fecaca;
+        }
+
+        /* Content Body */
+        .content-body {
+            padding: 30px;
+        }
+
+        .page-title {
+            margin-bottom: 25px;
+        }
+
+        .page-title h1 {
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .page-title p {
+            color: var(--secondary-color);
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: transform 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+        }
+
+        .stat-info h3 {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text-color);
+        }
+
+        .stat-info p {
+            font-size: 14px;
+            color: var(--secondary-color);
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        /* Colors for icons */
+        .bg-blue { background: #dbeafe; color: #2563eb; }
+        .bg-green { background: #dcfce7; color: #10b981; }
+        .bg-purple { background: #f3e8ff; color: #9333ea; }
+        .bg-orange { background: #ffedd5; color: #f97316; }
+
+        /* Quick Actions & Recent */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .card-header h3 {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .btn-link {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        /* Action Buttons Grid */
+        .actions-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .action-btn {
+            background: var(--background-color);
+            border: 1px solid var(--border-color);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .action-btn:hover {
+            border-color: var(--primary-color);
+            background: #eff6ff;
+        }
+
+        .action-btn i {
+            font-size: 20px;
+            color: var(--primary-color);
+        }
+
+        .action-btn span {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        /* Table */
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            font-size: 12px;
+            text-transform: uppercase;
+            color: var(--secondary-color);
+            font-weight: 600;
+        }
+
+        td {
+            font-size: 14px;
+        }
+
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .status-success { background: #dcfce7; color: #166534; }
+        .status-warning { background: #ffedd5; color: #9a3412; }
+
+        @media (max-width: 1024px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            .main-content {
+                margin-left: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <i class="fas fa-graduation-cap"></i>
+            <h2>Libruz Admin</h2>
+        </div>
+
+        <div class="sidebar-menu">
+            <div class="menu-category">Główne</div>
+            <a href="#" class="menu-item active">
+                <i class="fas fa-home"></i> Dashboard
+            </a>
+            <a href="#" class="menu-item">
+                <i class="fas fa-school"></i> Szkoła i Konfiguracja
+            </a>
+
+            <div class="menu-category">Użytkownicy</div>
+            <a href="#" class="menu-item">
+                <i class="fas fa-user-graduate"></i> Uczniowie
+            </a>
+            <a href="#" class="menu-item">
+                <i class="fas fa-chalkboard-teacher"></i> Nauczyciele
+            </a>
+            <a href="#" class="menu-item">
+                <i class="fas fa-user-tie"></i> Rodzice
+            </a>
+
+            <div class="menu-category">Organizacja</div>
+            <a href="#" class="menu-item">
+                <i class="fas fa-layer-group"></i> Klasy
+            </a>
+            <a href="#" class="menu-item">
+                <i class="fas fa-book"></i> Przedmioty
+            </a>
+            <a href="#" class="menu-item">
+                <i class="fas fa-calendar-alt"></i> Plan Lekcji
+            </a>
+
+            <div class="menu-category">System</div>
+            <a href="#" class="menu-item">
+                <i class="fas fa-envelope"></i> Wiadomości
+            </a>
+            <a href="#" class="menu-item">
+                <i class="fas fa-cog"></i> Ustawienia
+            </a>
+        </div>
+
+        <div class="sidebar-footer">
+            <div class="user-mini-profile">
+                <div class="avatar">AD</div>
+                <div class="user-info">
+                    <h4>Admin Systemu</h4>
+                    <p>Super Administrator</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <header class="top-header">
+            <div class="header-search">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Szukaj ucznia, nauczyciela...">
+            </div>
+            
+            <div class="header-actions">
+                <button class="btn-icon">
+                    <i class="fas fa-bell"></i>
+                    <span class="badge"></span>
+                </button>
+                <button class="btn-icon">
+                    <i class="fas fa-cog"></i>
+                </button>
+                <div style="border-left: 1px solid var(--border-color); height: 24px; margin: 0 5px;"></div>
+                <button class="btn-logout" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i> Wyloguj
+                </button>
+            </div>
+        </header>
+
+        <div class="content-body">
+            <div class="page-title">
+                <h1>Panel Główny</h1>
+                <p>Witaj w panelu zarządzania systemem Libruz. Oto podsumowanie Twojej szkoły.</p>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <h3>1,240</h3>
+                        <p>Aktywni Uczniowie</p>
+                    </div>
+                    <div class="stat-icon bg-blue">
+                        <i class="fas fa-user-graduate"></i>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <h3>84</h3>
+                        <p>Nauczyciele</p>
+                    </div>
+                    <div class="stat-icon bg-green">
+                        <i class="fas fa-chalkboard-teacher"></i>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <h3>32</h3>
+                        <p>Oddziały Klasowe</p>
+                    </div>
+                    <div class="stat-icon bg-purple">
+                        <i class="fas fa-layer-group"></i>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <h3>98%</h3>
+                        <p>Frekwencja Dziś</p>
+                    </div>
+                    <div class="stat-icon bg-orange">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dashboard-grid">
+                <div class="main-column">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Ostatnia Aktywność Systemowa</h3>
+                            <a href="#" class="btn-link">Zobacz logi</a>
+                        </div>
+                        <div class="table-responsive">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Użytkownik</th>
+                                        <th>Akcja</th>
+                                        <th>Czas</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Jan Kowalski (Nauczyciel)</td>
+                                        <td>Wystawienie ocen (Matematyka 4A)</td>
+                                        <td>2 min temu</td>
+                                        <td><span class="status-badge status-success">Sukces</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Anna Nowak (Dyrektor)</td>
+                                        <td>Aktualizacja planu lekcji</td>
+                                        <td>15 min temu</td>
+                                        <td><span class="status-badge status-success">Sukces</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>System</td>
+                                        <td>Kopia zapasowa bazy danych</td>
+                                        <td>1 godz. temu</td>
+                                        <td><span class="status-badge status-success">Sukces</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Marek Zając (Uczeń)</td>
+                                        <td>Próba logowania (błędne hasło)</td>
+                                        <td>2 godz. temu</td>
+                                        <td><span class="status-badge status-warning">Ostrzeżenie</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Statystyki Nieobecności (Ostatnie 7 dni)</h3>
+                        </div>
+                        <div style="height: 200px; display: flex; align-items: flex-end; justify-content: space-around; padding-bottom: 20px; border-bottom: 1px dashed var(--border-color);">
+                            <div style="width: 40px; height: 40%; background: var(--primary-color); border-radius: 4px 4px 0 0;" title="Pon"></div>
+                            <div style="width: 40px; height: 60%; background: var(--primary-color); border-radius: 4px 4px 0 0;" title="Wt"></div>
+                            <div style="width: 40px; height: 35%; background: var(--primary-color); border-radius: 4px 4px 0 0;" title="Śr"></div>
+                            <div style="width: 40px; height: 80%; background: var(--primary-color); border-radius: 4px 4px 0 0;" title="Czw"></div>
+                            <div style="width: 40px; height: 50%; background: var(--primary-color); border-radius: 4px 4px 0 0;" title="Pt"></div>
+                        </div>
+                        <div style="display: flex; justify-content: space-around; margin-top: 10px; font-size: 12px; color: var(--secondary-color);">
+                            <span>Pon</span><span>Wt</span><span>Śr</span><span>Czw</span><span>Pt</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="side-column">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Szybkie Akcje</h3>
+                        </div>
+                        <div class="actions-grid">
+                            <div class="action-btn" onclick="alert('Funkcja: Dodaj ucznia')">
+                                <i class="fas fa-user-plus"></i>
+                                <span>Dodaj Ucznia</span>
+                            </div>
+                            <div class="action-btn" onclick="alert('Funkcja: Dodaj nauczyciela')">
+                                <i class="fas fa-user-tie"></i>
+                                <span>Dodaj Nauczyciela</span>
+                            </div>
+                            <div class="action-btn" onclick="alert('Funkcja: Wyślij ogłoszenie')">
+                                <i class="fas fa-bullhorn"></i>
+                                <span>Ogłoszenie</span>
+                            </div>
+                            <div class="action-btn" onclick="alert('Funkcja: Generuj raport')">
+                                <i class="fas fa-file-alt"></i>
+                                <span>Raporty</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Stan Systemu</h3>
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 15px;">
+                            <div>
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 14px;">
+                                    <span>Obciążenie Serwera</span>
+                                    <span style="color: var(--success);">12%</span>
+                                </div>
+                                <div style="width: 100%; height: 6px; background: #e2e8f0; border-radius: 3px;">
+                                    <div style="width: 12%; height: 100%; background: var(--success); border-radius: 3px;"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 14px;">
+                                    <span>Pojemność Bazy</span>
+                                    <span style="color: var(--primary-color);">45%</span>
+                                </div>
+                                <div style="width: 100%; height: 6px; background: #e2e8f0; border-radius: 3px;">
+                                    <div style="width: 45%; height: 100%; background: var(--primary-color); border-radius: 3px;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sprawdzanie autoryzacji przy wejściu na stronę
+        document.addEventListener('DOMContentLoaded', () => {
+            const adminSession = localStorage.getItem('libruz_admin');
+            
+            // Proste zabezpieczenie - jeśli nie ma sesji, wyrzuć do logowania
+            // W prawdziwej aplikacji powinno to być weryfikowane tokenem po stronie serwera
+            if (!adminSession) {
+                alert('Brak autoryzacji. Nastąpi przekierowanie do logowania.');
+                window.location.href = '../login.html'; // Dostosuj ścieżkę jeśli plik logowania jest gdzie indziej
+            }
+
+            // Obsługa podświetlania menu
+            const menuItems = document.querySelectorAll('.menu-item');
+            menuItems.forEach(item => {
+                item.addEventListener('click', (e) => {
+                    // Tylko dla efektu wizualnego w demo
+                    if(item.getAttribute('href') === '#') e.preventDefault();
+                    
+                    menuItems.forEach(i => i.classList.remove('active'));
+                    item.classList.add('active');
+                });
+            });
+        });
+
+        function logout() {
+            if(confirm('Czy na pewno chcesz się wylogować?')) {
+                localStorage.removeItem('libruz_admin');
+                localStorage.removeItem('libruz_remember_admin');
+                window.location.href = '../login.html'; // Powrót do strony logowania (o jeden folder wyżej)
+            }
+        }
+    </script>
+</body>
+</html>
