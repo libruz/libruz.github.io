@@ -344,17 +344,14 @@
             </div>
             
             <div class="login-body">
-                <!-- Alert messages -->
                 <div class="alert" id="errorAlert"></div>
                 <div class="alert" id="successAlert"></div>
                 
-                <!-- Login info -->
                 <div class="login-info">
                     <strong>Logowanie do systemu</strong>
                     <p>Wpisz swój login i hasło aby się zalogować</p>
                 </div>
                 
-                <!-- Login form -->
                 <form id="loginForm">
                     <div class="form-group">
                         <label for="loginInput">Login</label>
@@ -408,7 +405,6 @@
         </div>
     </div>
 
-    <!-- Simple forgot password modal -->
     <div id="forgotPasswordModal" style="
         display: none;
         position: fixed;
@@ -448,7 +444,6 @@
         </div>
     </div>
 
-    <!-- Supabase JS Library - LOAD ONLY ONCE -->
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     
     <script>
@@ -518,7 +513,8 @@
                 try {
                     const adminData = JSON.parse(adminSession);
                     if (adminData && adminData.role === 'admin') {
-                        window.location.href = 'admin/index.html';
+                        // PRZEKIEROWANIE DO DASHBOARDU ADMINA
+                        window.location.href = 'admin/admin-dashboard.html';
                         return;
                     }
                 } catch (e) {
@@ -647,7 +643,8 @@
             
             showAlert('success', 'Logowanie pomyślne. Przekierowywanie...');
             setTimeout(() => {
-                window.location.href = 'admin/index.html';
+                // PRZEKIEROWANIE DO DASHBOARDU ADMINA
+                window.location.href = 'admin/admin-dashboard.html';
             }, 1000);
         }
         
@@ -782,7 +779,8 @@
         function redirectBasedOnRole(role) {
             switch(role) {
                 case 'admin':
-                    window.location.href = 'admin/index.html';
+                    // PRZEKIEROWANIE DO DASHBOARDU ADMINA
+                    window.location.href = 'admin/admin-dashboard.html';
                     break;
                 case 'director':
                     window.location.href = 'director/index.html';
