@@ -255,16 +255,6 @@
             color: var(--secondary-color);
         }
         
-        .login-footer a {
-            color: var(--primary-color);
-            text-decoration: none;
-            font-weight: 500;
-        }
-        
-        .login-footer a:hover {
-            text-decoration: underline;
-        }
-        
         .loading-spinner {
             display: none;
             width: 20px;
@@ -413,7 +403,6 @@
                 
                 <div class="login-footer">
                     <p>System Libruz v1.0.0 © 2024</p>
-                    <p>Wersja produkcyjna</p>
                 </div>
             </div>
         </div>
@@ -459,18 +448,24 @@
         </div>
     </div>
 
+    <!-- Supabase JS Library - LOAD ONLY ONCE -->
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    
     <script>
-        // SUPABASE KONFIGURACJA - UŻYJ SWOICH DANYCH Z SUPABASE
+        // KONFIGURACJA SUPABASE - PRODUKCYJNA
         const SUPABASE_URL = 'https://ajapafyjmovhblkwdpfj.supabase.co';
-        const SUPABASE_ANON_KEY = 'sb_publishable_OtQaYaIrrac8Kl5l-adJBw_1yAFZqg_';
+        const SUPABASE_KEY = 'sb_publishable_OtQaYaIrrac8Kl5l-adJBw_1yAFZqg_';
         
-        // Dane logowania admina
+        // DANE ADMINA
         const ADMIN_CREDENTIALS = {
             login: 'admin',
             password: 'Grahamka321@##'
         };
         
-        // DOM Elements
+        // GLOBALNE ZMIENNE
+        let supabaseClient = null;
+        
+        // DOM ELEMENTY
         const errorAlert = document.getElementById('errorAlert');
         const successAlert = document.getElementById('successAlert');
         const loginForm = document.getElementById('loginForm');
@@ -481,43 +476,95 @@
         const loginSpinner = document.getElementById('loginSpinner');
         const forgotPasswordModal = document.getElementById('forgotPasswordModal');
         
-        // Inicjalizacja strony
+        // INICJALIZACJA APLIKACJI
         document.addEventListener('DOMContentLoaded', function() {
-            // Sprawdź czy użytkownik jest już zalogowany
-            checkExistingSession();
-            
-            // Ustaw przełączanie widoczności hasła
-            togglePasswordBtn.addEventListener('click', function() {
-                togglePasswordVisibility();
-            });
-            
-            // Obsługa formularza logowania
-            loginForm.addEventListener('submit', async function(e) {
-                e.preventDefault();
-                await handleLogin();
-            });
-            
-            // Autofocus na polu loginu
-            loginInput.focus();
+            initApplication();
         });
         
-        // Sprawdź istniejącą sesję
+        // GŁÓWNA FUNKCJA INICJALIZUJĄCA
+        async function initApplication() {
+            try {
+                // Sprawdź istniejącą sesję
+                await checkExistingSession();
+                
+                // Inicjalizuj Supabase
+                supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
+                    auth: {
+                        autoRefreshToken: false,
+                        persistSession: false,
+                        detectSessionInUrl: false
+                    }
+                });
+                
+                // Ustaw event listenery
+                setupEventListeners();
+                
+                // Autofocus na pole loginu
+                setTimeout(() => {
+                    loginInput.focus();
+                }, 100);
+                
+            } catch (error) {
+                console.error('Błąd inicjalizacji aplikacji:', error);
+                showAlert('error', 'Błąd inicjalizacji systemu. Odśwież stronę.');
+            }
+        }
+        
+        // SPRAWDŹ ISTNIEJĄCĄ SESJĘ
         async function checkExistingSession() {
             // Sprawdź sesję admina
-            if (localStorage.getItem('libruz_admin')) {
-                window.location.href = '../admin/index.html';
-                return;
+            const adminSession = localStorage.getItem('libruz_admin');
+            if (adminSession) {
+                try {
+                    const adminData = JSON.parse(adminSession);
+                    if (adminData && adminData.role === 'admin') {
+                        window.location.href = 'admin/index.html';
+                        return;
+                    }
+                } catch (e) {
+                    localStorage.removeItem('libruz_admin');
+                }
             }
             
             // Sprawdź sesję użytkownika
             const userSession = localStorage.getItem('libruz_user');
             if (userSession) {
-                const user = JSON.parse(userSession);
-                redirectBasedOnRole(user.role);
+                try {
+                    const userData = JSON.parse(userSession);
+                    if (userData && userData.role) {
+                        redirectBasedOnRole(userData.role);
+                        return;
+                    }
+                } catch (e) {
+                    localStorage.removeItem('libruz_user');
+                }
             }
         }
         
-        // Przełącz widoczność hasła
+        // USTAWIENIE EVENT LISTENERÓW
+        function setupEventListeners() {
+            // Przełączanie widoczności hasła
+            togglePasswordBtn.addEventListener('click', togglePasswordVisibility);
+            
+            // Obsługa formularza logowania
+            loginForm.addEventListener('submit', handleLoginSubmit);
+            
+            // Zamknij modal po kliknięciu na tło
+            forgotPasswordModal.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    hideForgotPassword();
+                }
+            });
+            
+            // Enter w polu hasła również wysyła formularz
+            passwordInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    loginForm.dispatchEvent(new Event('submit'));
+                }
+            });
+        }
+        
+        // PRZEŁĄCZANIE WIDOCZNOŚCI HASŁA
         function togglePasswordVisibility() {
             const icon = togglePasswordBtn.querySelector('i');
             
@@ -532,7 +579,243 @@
             }
         }
         
-        // Pokaż alert
+        // OBSŁUGA WYSŁANIA FORMULARZA
+        async function handleLoginSubmit(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const login = loginInput.value.trim();
+            const password = passwordInput.value;
+            const rememberMe = document.getElementById('rememberMe').checked;
+            
+            // Walidacja podstawowa
+            if (!login || !password) {
+                showAlert('error', 'Wypełnij wszystkie pola');
+                loginForm.classList.add('shake');
+                setTimeout(() => loginForm.classList.remove('shake'), 500);
+                return;
+            }
+            
+            // Rozpocznij logowanie
+            await performLogin(login, password, rememberMe);
+        }
+        
+        // WYKONANIE LOGOWANIA
+        async function performLogin(login, password, rememberMe) {
+            setLoading(true);
+            
+            try {
+                // Sprawdź czy to admin
+                if (login === ADMIN_CREDENTIALS.login && password === ADMIN_CREDENTIALS.password) {
+                    await handleAdminLogin(rememberMe);
+                    return;
+                }
+                
+                // Spróbuj zalogować jako użytkownik
+                await handleUserLogin(login, password, rememberMe);
+                
+            } catch (error) {
+                console.error('Błąd logowania:', error);
+                showAlert('error', error.message || 'Błąd logowania');
+            } finally {
+                setLoading(false);
+            }
+        }
+        
+        // OBSŁUGA LOGOWANIA ADMINA
+        async function handleAdminLogin(rememberMe) {
+            const adminData = {
+                id: 'admin',
+                email: 'admin@libruz.pl',
+                role: 'admin',
+                login: 'admin',
+                first_name: 'Administrator',
+                last_name: 'Systemu',
+                is_admin: true,
+                timestamp: new Date().toISOString()
+            };
+            
+            // Zapisz sesję admina
+            localStorage.setItem('libruz_admin', JSON.stringify(adminData));
+            
+            // Opcjonalnie zapamiętaj
+            if (rememberMe) {
+                localStorage.setItem('libruz_remember_admin', 'true');
+            } else {
+                localStorage.removeItem('libruz_remember_admin');
+            }
+            
+            showAlert('success', 'Logowanie pomyślne. Przekierowywanie...');
+            setTimeout(() => {
+                window.location.href = 'admin/index.html';
+            }, 1000);
+        }
+        
+        // OBSŁUGA LOGOWANIA UŻYTKOWNIKA
+        async function handleUserLogin(login, password, rememberMe) {
+            // 1. Znajdź użytkownika po loginie
+            const { data: profile, error: profileError } = await supabaseClient
+                .from('user_profiles')
+                .select('*')
+                .eq('login', login)
+                .eq('deleted_at', null)
+                .single();
+            
+            if (profileError || !profile) {
+                throw new Error('Nieprawidłowy login lub hasło');
+            }
+            
+            // 2. Sprawdź czy konto jest zablokowane
+            if (profile.is_locked) {
+                throw new Error('Konto zablokowane. Skontaktuj się z administratorem.');
+            }
+            
+            // 3. Sprawdź czy trzeba zmienić hasło
+            if (profile.must_change_password || profile.is_temp_password) {
+                localStorage.setItem('temp_user_id', profile.id);
+                window.location.href = 'change-password.html';
+                return;
+            }
+            
+            // 4. Spróbuj zalogować przez Supabase Auth
+            const { data: authData, error: authError } = await supabaseClient.auth.signInWithPassword({
+                email: profile.email,
+                password: password
+            });
+            
+            if (authError) {
+                // Zwiększ licznik błędnych logowań
+                await incrementFailedAttempts(profile.id);
+                throw new Error('Nieprawidłowy login lub hasło');
+            }
+            
+            // 5. Zresetuj licznik błędów po udanym logowaniu
+            await resetFailedAttempts(profile.id);
+            
+            // 6. Zaktualizuj ostatnie logowanie
+            await updateLastLogin(profile.id);
+            
+            // 7. Zapisz sesję użytkownika
+            const userSession = {
+                id: authData.user.id,
+                email: authData.user.email,
+                role: profile.role,
+                school_id: profile.school_id,
+                profile_id: profile.id,
+                first_name: profile.first_name,
+                last_name: profile.last_name,
+                login: profile.login,
+                timestamp: new Date().toISOString()
+            };
+            
+            localStorage.setItem('libruz_user', JSON.stringify(userSession));
+            
+            // 8. Opcja zapamiętania
+            if (rememberMe) {
+                localStorage.setItem('libruz_remember_user', 'true');
+            } else {
+                localStorage.removeItem('libruz_remember_user');
+            }
+            
+            // 9. Pokaż sukces i przekieruj
+            showAlert('success', 'Logowanie pomyślne. Przekierowywanie...');
+            setTimeout(() => {
+                redirectBasedOnRole(profile.role);
+            }, 1000);
+        }
+        
+        // ZWIĘKSZ LICZNIK BŁĘDNYCH LOGOWAŃ
+        async function incrementFailedAttempts(userId) {
+            try {
+                const { data: profile } = await supabaseClient
+                    .from('user_profiles')
+                    .select('failed_login_attempts')
+                    .eq('id', userId)
+                    .single();
+                
+                const attempts = (profile?.failed_login_attempts || 0) + 1;
+                const isLocked = attempts >= 5;
+                
+                await supabaseClient
+                    .from('user_profiles')
+                    .update({ 
+                        failed_login_attempts: attempts,
+                        is_locked: isLocked
+                    })
+                    .eq('id', userId);
+                
+            } catch (error) {
+                console.error('Błąd inkrementacji prób logowania:', error);
+            }
+        }
+        
+        // ZRESETUJ LICZNIK BŁĘDNYCH LOGOWAŃ
+        async function resetFailedAttempts(userId) {
+            try {
+                await supabaseClient
+                    .from('user_profiles')
+                    .update({ 
+                        failed_login_attempts: 0,
+                        is_locked: false
+                    })
+                    .eq('id', userId);
+            } catch (error) {
+                console.error('Błąd resetowania prób logowania:', error);
+            }
+        }
+        
+        // ZAKTUALIZUJ OSTATNIE LOGOWANIE
+        async function updateLastLogin(userId) {
+            try {
+                await supabaseClient
+                    .from('user_profiles')
+                    .update({ 
+                        last_login: new Date().toISOString()
+                    })
+                    .eq('id', userId);
+            } catch (error) {
+                console.error('Błąd aktualizacji ostatniego logowania:', error);
+            }
+        }
+        
+        // PRZEKIERUJ WEDŁUG ROLI
+        function redirectBasedOnRole(role) {
+            switch(role) {
+                case 'admin':
+                    window.location.href = 'admin/index.html';
+                    break;
+                case 'director':
+                    window.location.href = 'director/index.html';
+                    break;
+                case 'teacher':
+                    window.location.href = 'teacher/index.html';
+                    break;
+                case 'student':
+                    window.location.href = 'student/index.html';
+                    break;
+                case 'parent':
+                    window.location.href = 'parent/index.html';
+                    break;
+                default:
+                    showAlert('error', 'Nieznana rola użytkownika');
+                    localStorage.removeItem('libruz_user');
+            }
+        }
+        
+        // POKAŻ/UKRYJ ŁADOWANIE
+        function setLoading(isLoading) {
+            if (isLoading) {
+                loginBtn.disabled = true;
+                loginSpinner.style.display = 'block';
+                loginBtn.querySelector('span').style.opacity = '0.5';
+            } else {
+                loginBtn.disabled = false;
+                loginSpinner.style.display = 'none';
+                loginBtn.querySelector('span').style.opacity = '1';
+            }
+        }
+        
+        // POKAŻ ALERT
         function showAlert(type, message) {
             // Ukryj wszystkie alerty
             errorAlert.style.display = 'none';
@@ -552,273 +835,15 @@
             }, 5000);
         }
         
-        // Pokaż stan ładowania
-        function setLoading(isLoading) {
-            if (isLoading) {
-                loginBtn.disabled = true;
-                loginSpinner.style.display = 'block';
-                loginBtn.querySelector('span').style.opacity = '0.5';
-            } else {
-                loginBtn.disabled = false;
-                loginSpinner.style.display = 'none';
-                loginBtn.querySelector('span').style.opacity = '1';
-            }
-        }
-        
-        // Obsługa logowania
-        async function handleLogin() {
-            const login = loginInput.value.trim();
-            const password = passwordInput.value;
-            const rememberMe = document.getElementById('rememberMe').checked;
-            
-            // Walidacja podstawowa
-            if (!login || !password) {
-                showAlert('error', 'Proszę wypełnić wszystkie pola');
-                loginForm.classList.add('shake');
-                setTimeout(() => loginForm.classList.remove('shake'), 500);
-                return;
-            }
-            
-            setLoading(true);
-            
-            try {
-                // SPRAWDŹ CZY TO ADMIN
-                if (login === ADMIN_CREDENTIALS.login && password === ADMIN_CREDENTIALS.password) {
-                    // Logowanie admina
-                    await handleAdminLogin(rememberMe);
-                } else {
-                    // Logowanie zwykłego użytkownika
-                    await handleUserLogin(login, password, rememberMe);
-                }
-            } catch (error) {
-                console.error('Login error:', error);
-                handleLoginError(error);
-            } finally {
-                setLoading(false);
-            }
-        }
-        
-        // Obsługa logowania admina
-        async function handleAdminLogin(rememberMe) {
-            const adminUser = {
-                id: 'admin',
-                email: 'admin@libruz.pl',
-                role: 'admin',
-                login: 'admin',
-                first_name: 'Administrator',
-                last_name: 'Systemu',
-                is_admin: true
-            };
-            
-            // Zapisz sesję admina
-            localStorage.setItem('libruz_admin', JSON.stringify(adminUser));
-            
-            // Opcja zapamiętania
-            if (rememberMe) {
-                localStorage.setItem('libruz_remember', 'true');
-            }
-            
-            // Pokaż sukces i przekieruj
-            showAlert('success', 'Logowanie administratora pomyślne! Przekierowywanie...');
-            setTimeout(() => {
-                window.location.href = '../admin/index.html';
-            }, 1000);
-        }
-        
-        // Obsługa logowania użytkownika
-        async function handleUserLogin(login, password, rememberMe) {
-            // Inicjalizuj Supabase
-            const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-                auth: {
-                    autoRefreshToken: true,
-                    persistSession: true,
-                    detectSessionInUrl: false
-                }
-            });
-            
-            // 1. Znajdź profil użytkownika po loginie
-            const { data: profile, error: profileError } = await supabase
-                .from('user_profiles')
-                .select('*')
-                .eq('login', login)
-                .eq('deleted_at', null)
-                .single();
-            
-            if (profileError || !profile) {
-                throw new Error('Nieprawidłowy login lub hasło');
-            }
-            
-            // Sprawdź czy konto jest zablokowane
-            if (profile.is_locked) {
-                throw new Error('Konto jest zablokowane. Skontaktuj się z administratorem.');
-            }
-            
-            // Sprawdź czy trzeba zmienić hasło
-            if (profile.must_change_password || profile.is_temp_password) {
-                // Zapisz ID użytkownika dla strony zmiany hasła
-                localStorage.setItem('temp_user_id', profile.id);
-                window.location.href = 'change-password.html';
-                return;
-            }
-            
-            // 2. Spróbuj zalogować przez Supabase Auth
-            const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
-                email: profile.email,
-                password: password
-            });
-            
-            if (authError) {
-                // Zwiększ licznik błędnych logowań
-                await incrementFailedAttempts(profile.id, supabase);
-                throw authError;
-            }
-            
-            // 3. Zresetuj licznik błędnych logowań przy udanym logowaniu
-            await resetFailedAttempts(profile.id, supabase);
-            
-            // 4. Zaktualizuj ostatnie logowanie
-            await updateLastLogin(profile.id, supabase);
-            
-            // 5. Zapisz sesję użytkownika
-            const userSession = {
-                id: authData.user.id,
-                email: authData.user.email,
-                role: profile.role,
-                school_id: profile.school_id,
-                profile_id: profile.id,
-                first_name: profile.first_name,
-                last_name: profile.last_name,
-                login: profile.login
-            };
-            
-            localStorage.setItem('libruz_user', JSON.stringify(userSession));
-            
-            // 6. Opcja zapamiętania
-            if (rememberMe) {
-                localStorage.setItem('libruz_remember', 'true');
-            }
-            
-            // 7. Pokaż sukces i przekieruj
-            showAlert('success', 'Logowanie pomyślne! Przekierowywanie...');
-            setTimeout(() => {
-                redirectBasedOnRole(profile.role);
-            }, 1000);
-        }
-        
-        // Zwiększ licznik błędnych logowań
-        async function incrementFailedAttempts(userId, supabaseClient) {
-            try {
-                const { data: profile } = await supabaseClient
-                    .from('user_profiles')
-                    .select('failed_login_attempts')
-                    .eq('id', userId)
-                    .single();
-                
-                const attempts = (profile?.failed_login_attempts || 0) + 1;
-                
-                await supabaseClient
-                    .from('user_profiles')
-                    .update({ 
-                        failed_login_attempts: attempts,
-                        is_locked: attempts >= 5
-                    })
-                    .eq('id', userId);
-                
-            } catch (error) {
-                console.error('Error incrementing failed attempts:', error);
-            }
-        }
-        
-        // Zresetuj licznik błędnych logowań
-        async function resetFailedAttempts(userId, supabaseClient) {
-            try {
-                await supabaseClient
-                    .from('user_profiles')
-                    .update({ 
-                        failed_login_attempts: 0,
-                        is_locked: false
-                    })
-                    .eq('id', userId);
-            } catch (error) {
-                console.error('Error resetting failed attempts:', error);
-            }
-        }
-        
-        // Zaktualizuj ostatnie logowanie
-        async function updateLastLogin(userId, supabaseClient) {
-            try {
-                await supabaseClient
-                    .from('user_profiles')
-                    .update({ 
-                        last_login: new Date().toISOString()
-                    })
-                    .eq('id', userId);
-            } catch (error) {
-                console.error('Error updating last login:', error);
-            }
-        }
-        
-        // Obsługa błędów logowania
-        function handleLoginError(error) {
-            let errorMessage = 'Błąd logowania';
-            
-            if (error.message.includes('Invalid login credentials')) {
-                errorMessage = 'Nieprawidłowy login lub hasło';
-            } else if (error.message.includes('Email not confirmed')) {
-                errorMessage = 'Email nie został potwierdzony';
-            } else if (error.message.includes('Too many requests')) {
-                errorMessage = 'Zbyt wiele prób logowania. Spróbuj później.';
-            } else if (error.message.includes('User not found')) {
-                errorMessage = 'Użytkownik nie istnieje w systemie';
-            } else {
-                errorMessage = error.message || 'Wystąpił nieoczekiwany błąd';
-            }
-            
-            showAlert('error', errorMessage);
-        }
-        
-        // Przekieruj w zależności od roli
-        function redirectBasedOnRole(role) {
-            switch(role) {
-                case 'admin':
-                    window.location.href = '../admin/index.html';
-                    break;
-                case 'director':
-                    window.location.href = '../director/index.html';
-                    break;
-                case 'teacher':
-                    window.location.href = '../teacher/index.html';
-                    break;
-                case 'student':
-                    window.location.href = '../student/index.html';
-                    break;
-                case 'parent':
-                    window.location.href = '../parent/index.html';
-                    break;
-                default:
-                    showAlert('error', 'Nieznana rola użytkownika');
-            }
-        }
-        
-        // Pokaż modal z przypomnieniem hasła
+        // POKAŻ MODAL PRZYPOMNIENIA HASŁA
         function showForgotPassword() {
             forgotPasswordModal.style.display = 'flex';
         }
         
-        // Ukryj modal z przypomnieniem hasła
+        // UKRYJ MODAL PRZYPOMNIENIA HASŁA
         function hideForgotPassword() {
             forgotPasswordModal.style.display = 'none';
         }
-        
-        // Zamknij modal po kliknięciu na tło
-        forgotPasswordModal.addEventListener('click', function(e) {
-            if (e.target === this) {
-                hideForgotPassword();
-            }
-        });
     </script>
-    
-    <!-- Dodaj Supabase JS tylko jeśli nie został już dodany -->
-    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 </body>
 </html>
