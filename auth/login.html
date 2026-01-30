@@ -816,13 +816,6 @@
                 hideForgotPassword();
             }
         });
-        
-        // Automatyczne wypełnienie dla testów (usuń w produkcji)
-        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-            console.log('Tryb testowy - możesz przetestować logowanie:');
-            console.log('Admin: login: "admin", hasło: "Grahamka321@##"');
-            console.log('Użytkownik testowy: login: "test", hasło: "Test123!"');
-        }
     </script>
     
     <!-- Dodaj Supabase JS tylko jeśli nie został już dodany -->
