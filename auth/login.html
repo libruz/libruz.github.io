@@ -99,66 +99,17 @@
             padding: 40px;
         }
         
-        .login-type {
-            display: flex;
-            background: var(--input-bg);
-            border-radius: 12px;
-            padding: 4px;
-            margin-bottom: 25px;
-            position: relative;
-        }
-        
-        .type-indicator {
-            position: absolute;
-            height: calc(100% - 8px);
-            width: calc(50% - 4px);
-            background: white;
-            border-radius: 8px;
-            box-shadow: var(--shadow-sm);
-            transition: transform 0.3s ease;
-            top: 4px;
-        }
-        
-        .type-indicator.admin {
-            transform: translateX(calc(100% + 4px));
-        }
-        
-        .type-btn {
-            flex: 1;
-            padding: 12px;
-            border: none;
-            background: transparent;
-            font-size: 15px;
-            font-weight: 500;
-            color: var(--secondary-color);
-            cursor: pointer;
-            border-radius: 8px;
-            transition: all 0.3s;
-            position: relative;
-            z-index: 1;
-        }
-        
-        .type-btn.active {
-            color: var(--primary-color);
-        }
-        
-        .admin-notice {
-            background: #fef3c7;
-            border: 1px solid #fde68a;
+        .login-info {
+            background: #f0f9ff;
+            border: 1px solid #bae6fd;
             border-radius: 10px;
             padding: 15px;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
             font-size: 14px;
-            display: none;
+            color: #0369a1;
         }
         
-        .admin-notice.show {
-            display: block;
-            animation: fadeIn 0.3s ease;
-        }
-        
-        .admin-notice strong {
-            color: #92400e;
+        .login-info strong {
             display: block;
             margin-bottom: 5px;
         }
@@ -324,55 +275,6 @@
             animation: spin 1s linear infinite;
         }
         
-        .role-selection {
-            margin-bottom: 25px;
-        }
-        
-        .role-label {
-            font-size: 14px;
-            font-weight: 500;
-            margin-bottom: 10px;
-            color: var(--text-color);
-        }
-        
-        .role-buttons {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 8px;
-        }
-        
-        .role-btn {
-            padding: 12px 8px;
-            border: 2px solid var(--border-color);
-            background: var(--input-bg);
-            border-radius: 10px;
-            font-size: 13px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 6px;
-            color: var(--text-color);
-        }
-        
-        .role-btn:hover {
-            border-color: var(--primary-color);
-            background: white;
-        }
-        
-        .role-btn.active {
-            border-color: var(--primary-color);
-            background: white;
-            color: var(--primary-color);
-            box-shadow: var(--shadow-sm);
-        }
-        
-        .role-btn i {
-            font-size: 18px;
-        }
-        
         .alert {
             padding: 15px;
             border-radius: 10px;
@@ -408,17 +310,6 @@
             to { opacity: 1; }
         }
         
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
         @keyframes shake {
             0%, 100% { transform: translateX(0); }
             25% { transform: translateX(-5px); }
@@ -439,30 +330,10 @@
                 padding: 30px 20px 25px;
             }
             
-            .role-buttons {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 10px;
-            }
-            
-            .role-btn {
-                padding: 12px;
-                font-size: 14px;
-            }
-            
             .remember-forgot {
                 flex-direction: column;
                 align-items: flex-start;
                 gap: 15px;
-            }
-            
-            .login-type {
-                margin-bottom: 20px;
-            }
-        }
-        
-        @media (max-width: 360px) {
-            .role-buttons {
-                grid-template-columns: 1fr;
             }
         }
     </style>
@@ -487,52 +358,18 @@
                 <div class="alert" id="errorAlert"></div>
                 <div class="alert" id="successAlert"></div>
                 
-                <!-- Login type switcher -->
-                <div class="login-type">
-                    <div class="type-indicator" id="typeIndicator"></div>
-                    <button type="button" class="type-btn active" id="btnStandard">
-                        Użytkownicy systemu
-                    </button>
-                    <button type="button" class="type-btn" id="btnAdmin">
-                        Administrator systemu
-                    </button>
-                </div>
-                
-                <!-- Admin notice -->
-                <div class="admin-notice" id="adminNotice">
-                    <strong>Logowanie administratora systemu</strong>
-                    <p>Jeżeli nie jesteś administratorem systemu, wybierz opcję "Użytkownicy systemu"</p>
-                </div>
-                
-                <!-- User type selection (only for standard users) -->
-                <div class="role-selection" id="roleSelection">
-                    <div class="role-label">Wybierz typ konta:</div>
-                    <div class="role-buttons">
-                        <button type="button" class="role-btn active" data-role="director">
-                            <i class="fas fa-user-tie"></i>
-                            <span>Dyrektor</span>
-                        </button>
-                        <button type="button" class="role-btn" data-role="teacher">
-                            <i class="fas fa-chalkboard-teacher"></i>
-                            <span>Nauczyciel</span>
-                        </button>
-                        <button type="button" class="role-btn" data-role="student">
-                            <i class="fas fa-user-graduate"></i>
-                            <span>Uczeń</span>
-                        </button>
-                        <button type="button" class="role-btn" data-role="parent">
-                            <i class="fas fa-users"></i>
-                            <span>Rodzic</span>
-                        </button>
-                    </div>
+                <!-- Login info -->
+                <div class="login-info">
+                    <strong>Logowanie do systemu</strong>
+                    <p>Wpisz swój login i hasło aby się zalogować</p>
                 </div>
                 
                 <!-- Login form -->
                 <form id="loginForm">
                     <div class="form-group">
-                        <label for="loginInput" id="loginLabel">Login</label>
+                        <label for="loginInput">Login</label>
                         <div class="input-with-icon">
-                            <i class="fas fa-user" id="loginIcon"></i>
+                            <i class="fas fa-user"></i>
                             <input 
                                 type="text" 
                                 id="loginInput" 
@@ -569,7 +406,7 @@
                     </div>
                     
                     <button type="submit" class="btn-login" id="loginBtn">
-                        <span id="loginBtnText">Zaloguj się</span>
+                        <span>Zaloguj się</span>
                         <div class="loading-spinner" id="loginSpinner"></div>
                     </button>
                 </form>
@@ -622,22 +459,12 @@
         </div>
     </div>
 
-    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <script>
-        // Supabase Configuration - ZMIEŃ TE WARTOŚCI NA SWOJE
-        const SUPABASE_URL = 'https://your-project.supabase.co';
-        const SUPABASE_ANON_KEY = 'your-anon-key';
+        // SUPABASE KONFIGURACJA - UŻYJ SWOICH DANYCH Z SUPABASE
+        const SUPABASE_URL = 'https://ajapafyjmovhblkwdpfj.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_OtQaYaIrrac8Kl5l-adJBw_1yAFZqg_';
         
-        // Initialize Supabase
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-            auth: {
-                autoRefreshToken: true,
-                persistSession: true,
-                detectSessionInUrl: false
-            }
-        });
-        
-        // Admin Credentials (hardcoded)
+        // Dane logowania admina
         const ADMIN_CREDENTIALS = {
             login: 'admin',
             password: 'Grahamka321@##'
@@ -646,171 +473,51 @@
         // DOM Elements
         const errorAlert = document.getElementById('errorAlert');
         const successAlert = document.getElementById('successAlert');
-        const typeIndicator = document.getElementById('typeIndicator');
-        const btnStandard = document.getElementById('btnStandard');
-        const btnAdmin = document.getElementById('btnAdmin');
-        const adminNotice = document.getElementById('adminNotice');
-        const roleSelection = document.getElementById('roleSelection');
-        const roleButtons = document.querySelectorAll('.role-btn');
         const loginForm = document.getElementById('loginForm');
-        const loginLabel = document.getElementById('loginLabel');
-        const loginIcon = document.getElementById('loginIcon');
         const loginInput = document.getElementById('loginInput');
         const passwordInput = document.getElementById('passwordInput');
         const togglePasswordBtn = document.getElementById('togglePassword');
         const loginBtn = document.getElementById('loginBtn');
-        const loginBtnText = document.getElementById('loginBtnText');
         const loginSpinner = document.getElementById('loginSpinner');
         const forgotPasswordModal = document.getElementById('forgotPasswordModal');
         
-        // Current state
-        let isAdminMode = false;
-        let currentRole = 'director';
-        
-        // Initialize the page
+        // Inicjalizacja strony
         document.addEventListener('DOMContentLoaded', function() {
-            // Check if user is already logged in
+            // Sprawdź czy użytkownik jest już zalogowany
             checkExistingSession();
             
-            // Set up login type switching
-            btnStandard.addEventListener('click', function() {
-                setLoginType(false);
-            });
-            
-            btnAdmin.addEventListener('click', function() {
-                setLoginType(true);
-            });
-            
-            // Set up role selection
-            roleButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    selectRole(this.getAttribute('data-role'));
-                });
-            });
-            
-            // Set up password toggle
+            // Ustaw przełączanie widoczności hasła
             togglePasswordBtn.addEventListener('click', function() {
                 togglePasswordVisibility();
             });
             
-            // Handle login form submission
+            // Obsługa formularza logowania
             loginForm.addEventListener('submit', async function(e) {
                 e.preventDefault();
                 await handleLogin();
             });
             
-            // Auto-select first role
-            selectRole('director');
-            
-            // Add demo data info
-            console.log('Dane logowania testowe:');
-            console.log('- Admin: login: "admin", hasło: "Grahamka321@##"');
-            console.log('- Przykładowy użytkownik: login: "test", hasło: "Test123!"');
+            // Autofocus na polu loginu
+            loginInput.focus();
         });
         
-        // Check existing session
+        // Sprawdź istniejącą sesję
         async function checkExistingSession() {
-            // Check for admin session
+            // Sprawdź sesję admina
             if (localStorage.getItem('libruz_admin')) {
                 window.location.href = '../admin/index.html';
                 return;
             }
             
-            // Check for Supabase session
-            const { data: { session } } = await supabase.auth.getSession();
-            
-            if (session) {
-                // Get user profile
-                const { data: profile, error } = await supabase
-                    .from('user_profiles')
-                    .select('*')
-                    .eq('auth_id', session.user.id)
-                    .single();
-                
-                if (profile && !error) {
-                    redirectBasedOnRole(profile.role);
-                }
+            // Sprawdź sesję użytkownika
+            const userSession = localStorage.getItem('libruz_user');
+            if (userSession) {
+                const user = JSON.parse(userSession);
+                redirectBasedOnRole(user.role);
             }
         }
         
-        // Set login type (admin or standard)
-        function setLoginType(adminMode) {
-            isAdminMode = adminMode;
-            
-            // Update buttons
-            btnStandard.classList.toggle('active', !adminMode);
-            btnAdmin.classList.toggle('active', adminMode);
-            
-            // Move indicator
-            typeIndicator.classList.toggle('admin', adminMode);
-            
-            // Show/hide admin notice
-            adminNotice.classList.toggle('show', adminMode);
-            
-            // Show/hide role selection
-            roleSelection.style.display = adminMode ? 'none' : 'block';
-            
-            // Update form labels and placeholders
-            if (adminMode) {
-                loginLabel.textContent = 'Login administratora';
-                loginInput.placeholder = 'Wpisz login administratora';
-                loginIcon.className = 'fas fa-user-shield';
-                loginInput.value = ADMIN_CREDENTIALS.login;
-                loginInput.readOnly = true;
-                loginInput.style.backgroundColor = '#f8f9fa';
-                loginBtnText.textContent = 'Zaloguj jako administrator';
-            } else {
-                loginLabel.textContent = 'Login';
-                loginInput.placeholder = 'Wpisz swój login';
-                loginIcon.className = 'fas fa-user';
-                loginInput.value = '';
-                loginInput.readOnly = false;
-                loginInput.style.backgroundColor = '';
-                loginBtnText.textContent = 'Zaloguj się';
-                updateLoginPlaceholder();
-            }
-            
-            // Focus on password field for admin
-            if (adminMode) {
-                setTimeout(() => {
-                    passwordInput.focus();
-                }, 100);
-            } else {
-                loginInput.focus();
-            }
-        }
-        
-        // Select role for standard users
-        function selectRole(role) {
-            roleButtons.forEach(button => {
-                button.classList.toggle('active', button.getAttribute('data-role') === role);
-            });
-            
-            currentRole = role;
-            updateLoginPlaceholder();
-        }
-        
-        // Update login placeholder based on selected role
-        function updateLoginPlaceholder() {
-            if (isAdminMode) return;
-            
-            switch(currentRole) {
-                case 'director':
-                    loginInput.placeholder = 'Wpisz login dyrektora (np. kowalskiD)';
-                    break;
-                case 'teacher':
-                    loginInput.placeholder = 'Wpisz login nauczyciela (np. nowakN)';
-                    break;
-                case 'student':
-                    loginInput.placeholder = 'Wpisz login ucznia (np. wisniewskiU)';
-                    break;
-                case 'parent':
-                    loginInput.placeholder = 'Wpisz login rodzica';
-                    break;
-            }
-        }
-        
-        // Toggle password visibility
+        // Przełącz widoczność hasła
         function togglePasswordVisibility() {
             const icon = togglePasswordBtn.querySelector('i');
             
@@ -825,9 +532,9 @@
             }
         }
         
-        // Show alert message
+        // Pokaż alert
         function showAlert(type, message) {
-            // Hide all alerts first
+            // Ukryj wszystkie alerty
             errorAlert.style.display = 'none';
             successAlert.style.display = 'none';
             
@@ -839,32 +546,32 @@
             `;
             alert.style.display = 'block';
             
-            // Auto-hide after 5 seconds
+            // Auto-ukryj po 5 sekundach
             setTimeout(() => {
                 alert.style.display = 'none';
             }, 5000);
         }
         
-        // Show loading state
+        // Pokaż stan ładowania
         function setLoading(isLoading) {
             if (isLoading) {
                 loginBtn.disabled = true;
                 loginSpinner.style.display = 'block';
-                loginBtnText.style.opacity = '0.5';
+                loginBtn.querySelector('span').style.opacity = '0.5';
             } else {
                 loginBtn.disabled = false;
                 loginSpinner.style.display = 'none';
-                loginBtnText.style.opacity = '1';
+                loginBtn.querySelector('span').style.opacity = '1';
             }
         }
         
-        // Handle login
+        // Obsługa logowania
         async function handleLogin() {
             const login = loginInput.value.trim();
             const password = passwordInput.value;
             const rememberMe = document.getElementById('rememberMe').checked;
             
-            // Basic validation
+            // Walidacja podstawowa
             if (!login || !password) {
                 showAlert('error', 'Proszę wypełnić wszystkie pola');
                 loginForm.classList.add('shake');
@@ -875,36 +582,13 @@
             setLoading(true);
             
             try {
-                if (isAdminMode) {
-                    // ADMIN LOGIN
-                    if (login === ADMIN_CREDENTIALS.login && password === ADMIN_CREDENTIALS.password) {
-                        // Successful admin login
-                        const adminUser = {
-                            id: 'admin',
-                            email: 'admin@libruz.pl',
-                            role: 'admin',
-                            login: 'admin',
-                            first_name: 'Administrator',
-                            last_name: 'Systemu',
-                            is_admin: true
-                        };
-                        
-                        // Store admin session
-                        localStorage.setItem('libruz_admin', JSON.stringify(adminUser));
-                        
-                        // Show success message
-                        showAlert('success', 'Logowanie administratora pomyślne! Przekierowywanie...');
-                        
-                        // Redirect to admin panel
-                        setTimeout(() => {
-                            window.location.href = '../admin/index.html';
-                        }, 1000);
-                    } else {
-                        throw new Error('Nieprawidłowe dane logowania administratora');
-                    }
+                // SPRAWDŹ CZY TO ADMIN
+                if (login === ADMIN_CREDENTIALS.login && password === ADMIN_CREDENTIALS.password) {
+                    // Logowanie admina
+                    await handleAdminLogin(rememberMe);
                 } else {
-                    // STANDARD USER LOGIN
-                    await handleStandardUserLogin(login, password, rememberMe);
+                    // Logowanie zwykłego użytkownika
+                    await handleUserLogin(login, password, rememberMe);
                 }
             } catch (error) {
                 console.error('Login error:', error);
@@ -914,9 +598,45 @@
             }
         }
         
-        // Handle standard user login
-        async function handleStandardUserLogin(login, password, rememberMe) {
-            // 1. Find user profile by login
+        // Obsługa logowania admina
+        async function handleAdminLogin(rememberMe) {
+            const adminUser = {
+                id: 'admin',
+                email: 'admin@libruz.pl',
+                role: 'admin',
+                login: 'admin',
+                first_name: 'Administrator',
+                last_name: 'Systemu',
+                is_admin: true
+            };
+            
+            // Zapisz sesję admina
+            localStorage.setItem('libruz_admin', JSON.stringify(adminUser));
+            
+            // Opcja zapamiętania
+            if (rememberMe) {
+                localStorage.setItem('libruz_remember', 'true');
+            }
+            
+            // Pokaż sukces i przekieruj
+            showAlert('success', 'Logowanie administratora pomyślne! Przekierowywanie...');
+            setTimeout(() => {
+                window.location.href = '../admin/index.html';
+            }, 1000);
+        }
+        
+        // Obsługa logowania użytkownika
+        async function handleUserLogin(login, password, rememberMe) {
+            // Inicjalizuj Supabase
+            const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+                auth: {
+                    autoRefreshToken: true,
+                    persistSession: true,
+                    detectSessionInUrl: false
+                }
+            });
+            
+            // 1. Znajdź profil użytkownika po loginie
             const { data: profile, error: profileError } = await supabase
                 .from('user_profiles')
                 .select('*')
@@ -928,38 +648,38 @@
                 throw new Error('Nieprawidłowy login lub hasło');
             }
             
-            // Check if account is locked
+            // Sprawdź czy konto jest zablokowane
             if (profile.is_locked) {
                 throw new Error('Konto jest zablokowane. Skontaktuj się z administratorem.');
             }
             
-            // Check if password needs to be changed
+            // Sprawdź czy trzeba zmienić hasło
             if (profile.must_change_password || profile.is_temp_password) {
-                // Store user ID for password change page
+                // Zapisz ID użytkownika dla strony zmiany hasła
                 localStorage.setItem('temp_user_id', profile.id);
                 window.location.href = 'change-password.html';
                 return;
             }
             
-            // 2. Attempt to sign in with Supabase Auth
+            // 2. Spróbuj zalogować przez Supabase Auth
             const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
                 email: profile.email,
                 password: password
             });
             
             if (authError) {
-                // Increment failed login attempts
-                await incrementFailedAttempts(profile.id);
+                // Zwiększ licznik błędnych logowań
+                await incrementFailedAttempts(profile.id, supabase);
                 throw authError;
             }
             
-            // 3. Reset failed login attempts on successful login
-            await resetFailedAttempts(profile.id);
+            // 3. Zresetuj licznik błędnych logowań przy udanym logowaniu
+            await resetFailedAttempts(profile.id, supabase);
             
-            // 4. Update last login timestamp
-            await updateLastLogin(profile.id);
+            // 4. Zaktualizuj ostatnie logowanie
+            await updateLastLogin(profile.id, supabase);
             
-            // 5. Store user session data
+            // 5. Zapisz sesję użytkownika
             const userSession = {
                 id: authData.user.id,
                 email: authData.user.email,
@@ -973,19 +693,72 @@
             
             localStorage.setItem('libruz_user', JSON.stringify(userSession));
             
-            // 6. Remember me option
+            // 6. Opcja zapamiętania
             if (rememberMe) {
                 localStorage.setItem('libruz_remember', 'true');
             }
             
-            // 7. Show success message and redirect
+            // 7. Pokaż sukces i przekieruj
             showAlert('success', 'Logowanie pomyślne! Przekierowywanie...');
             setTimeout(() => {
                 redirectBasedOnRole(profile.role);
             }, 1000);
         }
         
-        // Handle login errors
+        // Zwiększ licznik błędnych logowań
+        async function incrementFailedAttempts(userId, supabaseClient) {
+            try {
+                const { data: profile } = await supabaseClient
+                    .from('user_profiles')
+                    .select('failed_login_attempts')
+                    .eq('id', userId)
+                    .single();
+                
+                const attempts = (profile?.failed_login_attempts || 0) + 1;
+                
+                await supabaseClient
+                    .from('user_profiles')
+                    .update({ 
+                        failed_login_attempts: attempts,
+                        is_locked: attempts >= 5
+                    })
+                    .eq('id', userId);
+                
+            } catch (error) {
+                console.error('Error incrementing failed attempts:', error);
+            }
+        }
+        
+        // Zresetuj licznik błędnych logowań
+        async function resetFailedAttempts(userId, supabaseClient) {
+            try {
+                await supabaseClient
+                    .from('user_profiles')
+                    .update({ 
+                        failed_login_attempts: 0,
+                        is_locked: false
+                    })
+                    .eq('id', userId);
+            } catch (error) {
+                console.error('Error resetting failed attempts:', error);
+            }
+        }
+        
+        // Zaktualizuj ostatnie logowanie
+        async function updateLastLogin(userId, supabaseClient) {
+            try {
+                await supabaseClient
+                    .from('user_profiles')
+                    .update({ 
+                        last_login: new Date().toISOString()
+                    })
+                    .eq('id', userId);
+            } catch (error) {
+                console.error('Error updating last login:', error);
+            }
+        }
+        
+        // Obsługa błędów logowania
         function handleLoginError(error) {
             let errorMessage = 'Błąd logowania';
             
@@ -1004,60 +777,7 @@
             showAlert('error', errorMessage);
         }
         
-        // Increment failed login attempts
-        async function incrementFailedAttempts(userId) {
-            try {
-                const { data: profile } = await supabase
-                    .from('user_profiles')
-                    .select('failed_login_attempts')
-                    .eq('id', userId)
-                    .single();
-                
-                const attempts = (profile?.failed_login_attempts || 0) + 1;
-                
-                await supabase
-                    .from('user_profiles')
-                    .update({ 
-                        failed_login_attempts: attempts,
-                        is_locked: attempts >= 5
-                    })
-                    .eq('id', userId);
-                
-            } catch (error) {
-                console.error('Error incrementing failed attempts:', error);
-            }
-        }
-        
-        // Reset failed login attempts
-        async function resetFailedAttempts(userId) {
-            try {
-                await supabase
-                    .from('user_profiles')
-                    .update({ 
-                        failed_login_attempts: 0,
-                        is_locked: false
-                    })
-                    .eq('id', userId);
-            } catch (error) {
-                console.error('Error resetting failed attempts:', error);
-            }
-        }
-        
-        // Update last login timestamp
-        async function updateLastLogin(userId) {
-            try {
-                await supabase
-                    .from('user_profiles')
-                    .update({ 
-                        last_login: new Date().toISOString()
-                    })
-                    .eq('id', userId);
-            } catch (error) {
-                console.error('Error updating last login:', error);
-            }
-        }
-        
-        // Redirect based on user role
+        // Przekieruj w zależności od roli
         function redirectBasedOnRole(role) {
             switch(role) {
                 case 'admin':
@@ -1080,37 +800,32 @@
             }
         }
         
-        // Show forgot password modal
+        // Pokaż modal z przypomnieniem hasła
         function showForgotPassword() {
             forgotPasswordModal.style.display = 'flex';
         }
         
-        // Hide forgot password modal
+        // Ukryj modal z przypomnieniem hasła
         function hideForgotPassword() {
             forgotPasswordModal.style.display = 'none';
         }
         
-        // Close modal when clicking outside
+        // Zamknij modal po kliknięciu na tło
         forgotPasswordModal.addEventListener('click', function(e) {
             if (e.target === this) {
                 hideForgotPassword();
             }
         });
         
-        // Add some demo accounts info for testing
-        console.log('Przykładowe loginy do testowania:');
-        console.log('1. Admin - login: admin, hasło: Grahamka321@##');
-        console.log('2. Dyrektor - login: kowalskiD, hasło: Dyrektor123!');
-        console.log('3. Nauczyciel - login: nowakN, hasło: Nauczyciel123!');
-        console.log('4. Uczeń - login: wisniewskiU, hasło: Uczen123!');
-        console.log('5. Rodzic - login: kowalskiR, hasło: Rodzic123!');
-        
-        // Pre-fill for testing (remove in production)
-        if (window.location.href.includes('localhost')) {
-            console.log('Tryb testowy - pre-filling form for testing');
-            loginInput.value = 'admin';
-            passwordInput.value = 'Grahamka321@##';
+        // Automatyczne wypełnienie dla testów (usuń w produkcji)
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+            console.log('Tryb testowy - możesz przetestować logowanie:');
+            console.log('Admin: login: "admin", hasło: "Grahamka321@##"');
+            console.log('Użytkownik testowy: login: "test", hasło: "Test123!"');
         }
     </script>
+    
+    <!-- Dodaj Supabase JS tylko jeśli nie został już dodany -->
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 </body>
 </html>
